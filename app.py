@@ -5,6 +5,7 @@
 
 import google.generativeai as genai
 import streamlit as st
+import os
 
 # ✅ إعدادات الصفحة
 st.set_page_config(
@@ -14,8 +15,29 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ✅ ضع هنا مفتاح Gemini API الخاص بك
-API_KEY = "AIzaSyCXIirGg8Mf0j3gLqo3Sxs7kqgbSeHpovM"  # احصل عليه من: https://makersuite.google.com/app/apikey
+# ✅ الحصول على API Key بشكل آمن
+# الطريقة 1: من متغيرات البيئة (الأفضل)
+API_KEY = os.getenv("AIzaSyCXIirGg8Mf0j3gLqo3Sxs7kqgbSeHpovM")
+
+# الطريقة 2: من Streamlit Secrets (للإنتاج)
+if not API_KEY:
+    try:
+        API_KEY = st.secrets["GEMINI_API_KEY"]
+    except:
+        pass
+
+# الطريقة 3: إدخال يدوي من المستخدم
+if not API_KEY:
+    st.sidebar.title("🔑 إعداد API Key")
+    API_KEY = st.sidebar.text_input(
+        "أدخل Gemini API Key:",
+        type="password",
+        help="احصل عليه من: https://makersuite.google.com/app/apikey"
+    )
+    if not API_KEY:
+        st.error("⚠️ يرجى إدخال API Key للمتابعة!")
+        st.info("📌 احصل على المفتاح من: https://makersuite.google.com/app/apikey")
+        st.stop()
 
 # ✅ System Prompt - شخصية البوت المتخصصة
 SYSTEM_PROMPT = """أنت خبير متخصص في زيت الزيتون اسمك "AmrBot". 
@@ -131,21 +153,23 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# ✅ التحقق من API Key
-if not API_KEY:
-    st.error("⚠️ يرجى إضافة API_KEY في السطر 16 من الكود!")
-    st.info("احصل على المفتاح من: https://makersuite.google.com/app/apikey")
-    st.stop()
-
 # إعداد الاتصال بـ Google Gemini
-genai.configure(api_key=API_KEY)
+try:
+    genai.configure(api_key=API_KEY)
+except Exception as e:
+    st.error(f"❌ خطأ في تكوين API: {str(e)}")
+    st.stop()
 
 # ✅ تهيئة Session State
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
 if "model" not in st.session_state:
-    st.session_state.model = genai.GenerativeModel("gemini-1.5-flash")
+    try:
+        st.session_state.model = genai.GenerativeModel("gemini-1.5-flash")
+    except Exception as e:
+        st.error(f"❌ خطأ في تحميل النموذج: {str(e)}")
+        st.stop()
 
 # ✅ دالة المحادثة
 def get_gemini_response(user_message):
@@ -162,7 +186,7 @@ def get_gemini_response(user_message):
         return response.text
     
     except Exception as e:
-        return f"❌ حدث خطأ: {str(e)}"
+        return f"❌ حدث خطأ: {str(e)}\n\n💡 تأكد من صحة API Key وأن لديك رصيد كافٍ"
 
 # ✅ Sidebar المحسّنة
 with st.sidebar:
