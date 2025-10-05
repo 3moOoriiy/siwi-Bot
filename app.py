@@ -17,7 +17,7 @@ st.set_page_config(
 
 # ✅ الحصول على API Key بشكل آمن
 # الطريقة 1: من متغيرات البيئة (الأفضل)
-API_KEY = os.getenv("AIzaSyCXIirGg8Mf0j3gLqo3Sxs7kqgbSeHpovM")
+API_KEY = os.getenv("GEMINI_API_KEY")
 
 # الطريقة 2: من Streamlit Secrets (للإنتاج)
 if not API_KEY:
