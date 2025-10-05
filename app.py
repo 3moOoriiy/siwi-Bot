@@ -15,7 +15,7 @@ st.set_page_config(
 )
 
 # ✅ ضع هنا مفتاح Gemini API الخاص بك
-API_KEY = ""  # احصل عليه من: https://makersuite.google.com/app/apikey
+API_KEY = "AIzaSyCXIirGg8Mf0j3gLqo3Sxs7kqgbSeHpovM"  
 
 # ✅ System Prompt - شخصية البوت المتخصصة
 SYSTEM_PROMPT = """أنت خبير متخصص في زيت الزيتون اسمك "AmrBot". 
